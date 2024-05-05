@@ -29,6 +29,7 @@ namespace CsvFileUpload
                 .ConfigureServices(services =>
                 {
                     services.AddRouting();
+                    services.AddControllers();
                     services.AddSingleton(new FileUploadService(awsAccessKeyId, awsSecretAccessKey, awsRegion, s3BucketName));
                 })
                 .Configure(app =>
@@ -42,35 +43,7 @@ namespace CsvFileUpload
                     });
                     app.UseEndpoints(endpoints =>
                     {
-                        endpoints.MapGet("{*path}", async context =>
-                        {
-                            context.Response.ContentType = "text/html";
-                            await context.Response.SendFileAsync(Path.Combine(Directory.GetCurrentDirectory(), "index.html"));
-                        });
-                        endpoints.MapPost("/upload", async context =>
-                        {
-                            var form = await context.Request.ReadFormAsync();
-                            var file = form.Files["file"];
-                            var fileUploadService = app.ApplicationServices.GetService<FileUploadService>();
-
-                            if (file == null || fileUploadService == null)
-                            {
-                                context.Response.StatusCode = 400;
-                                await context.Response.WriteAsync("File or file upload service is null");
-                                return;
-                            }
-
-                            var result = await fileUploadService.UploadFileAsync(file);
-                            if (result == "File uploaded successfully")
-                            {
-                                context.Response.StatusCode = 200;
-                            }
-                            else
-                            {
-                                context.Response.StatusCode = 400;
-                            }
-                            await context.Response.WriteAsync(result);
-                        });
+                        endpoints.MapControllers();
                     });
                 })
                 .Build();
