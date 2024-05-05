@@ -8,7 +8,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- .NET Core 8.0 or later
+- .NET Core 8.0 or later https://dotnet.microsoft.com/en-us/download
+- AWS Account https://aws.amazon.com/
+- Env.txt file for AWS Credentials
 
 ### Installing
 
