@@ -1,5 +1,3 @@
-using Microsoft.Extensions.FileProviders;
-
 namespace CsvFileUpload
 {
     class Program
@@ -34,20 +32,8 @@ namespace CsvFileUpload
                 .Configure(app =>
                 {
                     app.UseRouting();
-                    app.UseStaticFiles(new StaticFileOptions
-                    {
-                        FileProvider = new PhysicalFileProvider(
-                            Path.Combine(Directory.GetCurrentDirectory())),
-                        RequestPath = ""
-                    });
                     app.UseEndpoints(endpoints =>
                     {
-                        endpoints.MapGet("{*path}", async context =>
-                        {
-                            context.Response.ContentType = "text/html";
-                            await context.Response.SendFileAsync(Path.Combine(Directory.GetCurrentDirectory(), "index.html"));
-                        });
-
                         endpoints.MapPost("/upload", async context =>
                         {
                             var form = await context.Request.ReadFormAsync();

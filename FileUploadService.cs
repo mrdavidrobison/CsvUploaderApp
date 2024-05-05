@@ -3,12 +3,20 @@ using Amazon.S3.Transfer;
 
 namespace CsvFileUpload
 {
-    public class FileUploadService(string awsAccessKeyId, string awsSecretAccessKey, string awsRegion, string s3BucketName)
+    public class FileUploadService
     {
-        private readonly string awsAccessKeyId = awsAccessKeyId;
-        private readonly string awsSecretAccessKey = awsSecretAccessKey;
-        private readonly string awsRegion = awsRegion;
-        private readonly string s3BucketName = s3BucketName;
+        private readonly string awsAccessKeyId;
+        private readonly string awsSecretAccessKey;
+        private readonly string awsRegion;
+        private readonly string s3BucketName;
+
+        public FileUploadService(string awsAccessKeyId, string awsSecretAccessKey, string awsRegion, string s3BucketName)
+        {
+            this.awsAccessKeyId = awsAccessKeyId;
+            this.awsSecretAccessKey = awsSecretAccessKey;
+            this.awsRegion = awsRegion;
+            this.s3BucketName = s3BucketName;
+        }
 
         public async Task<string> UploadFileAsync(IFormFile file)
         {

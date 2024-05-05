@@ -37,7 +37,7 @@
 			.card {
 				border-radius: 10px;
 				box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
-				width: 600px;
+				width: 1000px;
 				height: 260px;
 				background-color: #ffffff;
 				padding: 10px 30px 40px;
@@ -56,7 +56,6 @@
 				align-items: center;
 				justify-content: center;
 				flex-direction: column;
-				border: 3px dotted #a3a3a3;
 				border-radius: 5px;
 			}
 
@@ -74,101 +73,64 @@
 			}
 
 			.btn {
-				text-decoration: none;
-				background-color: #005af0;
-				color: #ffffff;
-				padding: 10px 20px;
-				border: none;
-				outline: none;
-				transition: 0.3s;
+					text-decoration: none;
+					background-color: #005af0;
+					color: #ffffff;
+					padding: 10px 20px;
+					border: none;
+					outline: none;
+					transition: 0.3s;
+					border-radius: 4px;
+					cursor: pointer;
 			}
 
-			.btn:hover{
-				text-decoration: none;
-				background-color: #ffffff;
-				color: #005af0;
-				padding: 10px 20px;
-				border: none;
-				outline: 1px solid #010101;
-			}
-			.form input {
-				margin: 10px 0;
-				width: 100%;
-				background-color: #e2e2e2;
-				border: none;
-				outline: none;
-				padding: 12px 20px;
-				border-radius: 4px;
+			.btn:hover {
+					background-color: #ffffff;
+					color: #005af0;
+					border: 1px solid #010101;
 			}
 
+			.input-field {
+					margin: 10px 0;
+					width: 80%;
+					border: none;
+					outline: none;
+					padding: 12px 20px;
+					border-radius: 4px;
+			}
+
+			.input-field[type="file"]::-webkit-file-upload-button {
+					background-color: #005af0;
+					color: #ffffff;
+					padding: 10px 20px;
+					border: none;
+					border-radius: 4px;
+					cursor: pointer;
+			}
+
+			.input-field[type="file"]::-webkit-file-upload-button:hover,
+			.input-field[type="file"]::-webkit-file-upload-button:focus {
+					background-color: #ffffff;
+					color: #005af0;
+					border: 1px solid #010101;
+			}
 		</style>
-    <script> 
-			window.onload = function() {
-				function uploadFile(event) {
-							event.preventDefault();
-							var fileInput = document.getElementById('fileInput');
-							var formData = new FormData();
-							formData.append('file', fileInput.files[0]);
-							fetch('/upload', {
-									method: 'POST',
-									body: formData
-							})
-							.then(response => {
-									if (!response.ok) {
-											throw new Error('Network response was not ok');
-									}
-									return response.text();
-							})
-							.then(data => {
-									alert(data);
-							})
-							.catch((error) => {
-									console.error('Error:', error);
-									alert('Error: ' + error);
-							});
-					}
-
-					const dropArea = document.querySelector(".drop_box"),
-					button = dropArea.querySelector("form .submit"),
-					dragText = dropArea.querySelector("header"),
-					input = dropArea.querySelector("input");
-					let file;
-					var filename;
-
-					button.onclick = () => {
-						input.click();
-					};
-
-					input.addEventListener("change", function (e) {
-						var fileName = e.target.files[0].name;
-						let filedata = `
-							<form action="" method="post">
-							<div class="form">
-							<h4>${fileName}</h4>
-							<input type="email" placeholder="Enter email upload file">
-							<button class="btn">Upload</button>
-							</div>
-							</form>`;
-						dropArea.innerHTML = filedata;
-					});
-			}
-    </script>
 </head>
 <body>
-    <div class="container">
-			<div class="card">
-				<h3>Upload Files</h3>
-				<div class="drop_box">
-					<header>
-						<h4>Select File here</h4>
-					</header>
-					<p>Files Supported: CSV</p>
-					<form onsubmit="uploadFile(event)">
-						<input type="file" hidden accept=".csv" id="fileInput" style="display:none;">
-						<button class="submit">Choose File</button>
-					</form>
-				</div>
+	<div class="container">
+		<div class="card">
+			<h3>Upload Files</h3>
+			<div class="drop_box">
+				<header>
+					<h4>Select File here</h4>
+				</header>
+				<p>Files Supported: CSV</p>
+				<form action="/upload" method="post" enctype="multipart/form-data">
+					<input type="file" name="file" id="fileInput" accept=".csv" class="input-field">
+					<button type="submit" class="btn">Upload</button>
+			</form>
 			</div>
 		</div>
+	</div>
 </body>
 </html>
