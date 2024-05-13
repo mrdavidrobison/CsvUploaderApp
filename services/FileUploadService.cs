@@ -33,17 +33,17 @@ namespace CsvFileUpload
                 using var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, Amazon.RegionEndpoint.GetBySystemName(awsRegion));
                 var transferUtility = new TransferUtility(client);
 
-                foreach (var file in files)
+                await Task.WhenAll(files.Select(async file =>
                 {
                     if (file == null || file.Length == 0)
                     {
                         results.Add(new FileUploadResult { FileName = "Empty file", IsSuccess = false, ErrorMessage = "Empty file uploaded" });
-                        continue;
+                        return;
                     }
 
                     await transferUtility.UploadAsync(file.OpenReadStream(), s3BucketName, file.FileName);
                     results.Add(new FileUploadResult { FileName = file.FileName, IsSuccess = true });
-                }
+                }));
             }
             catch (AmazonS3Exception e)
             {
