@@ -49,21 +49,25 @@ namespace CsvFileUpload.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload(IFormFile file)
+        public async Task<IActionResult> Upload(List<IFormFile> files)
         {
-            if (file == null)
+            if (files == null || files.Count == 0)
             {
-                return BadRequest("File is null");
+                return BadRequest("No files uploaded");
             }
 
-            var result = await fileUploadService.UploadFileAsync(file);
-            if (result == "File uploaded successfully")
+            var results = await fileUploadService.UploadFilesAsync(files);
+            var successResults = results.Where(r => r.IsSuccess).ToList();
+            var failedResults = results.Where(r => !r.IsSuccess).ToList();
+
+            if (successResults.Count == files.Count)
             {
-                return Ok(result);
+                return Ok("All files uploaded successfully");
             }
             else
             {
-                return BadRequest(result);
+                var errorMessage = $"Some files failed to upload. Total files: {files.Count}, Success: {successResults.Count}, Failed: {failedResults.Count}";
+                return BadRequest(errorMessage);
             }
         }
     }

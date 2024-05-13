@@ -18,28 +18,58 @@ namespace CsvFileUpload
             this.s3BucketName = s3BucketName;
         }
 
-        public async Task<string> UploadFileAsync(IFormFile file)
+        public async Task<List<FileUploadResult>> UploadFilesAsync(List<IFormFile> files)
         {
-            if (file == null || file.Length == 0)
+            var results = new List<FileUploadResult>();
+
+            if (files == null || files.Count == 0)
             {
-                return "No file uploaded";
+                results.Add(new FileUploadResult { FileName = "No files", IsSuccess = false, ErrorMessage = "No files uploaded" });
+                return results;
             }
 
             try
             {
                 using var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, Amazon.RegionEndpoint.GetBySystemName(awsRegion));
                 var transferUtility = new TransferUtility(client);
-                await transferUtility.UploadAsync(file.OpenReadStream(), s3BucketName, file.FileName);
-                return "File uploaded successfully";
+
+                foreach (var file in files)
+                {
+                    if (file == null || file.Length == 0)
+                    {
+                        results.Add(new FileUploadResult { FileName = "Empty file", IsSuccess = false, ErrorMessage = "Empty file uploaded" });
+                        continue;
+                    }
+
+                    await transferUtility.UploadAsync(file.OpenReadStream(), s3BucketName, file.FileName);
+                    results.Add(new FileUploadResult { FileName = file.FileName, IsSuccess = true });
+                }
             }
             catch (AmazonS3Exception e)
             {
-                return $"AWS S3 error: {e.Message}";
+                var errorMessage = $"AWS S3 error: {e.Message}";
+                foreach (var file in files)
+                {
+                    results.Add(new FileUploadResult { FileName = file.FileName, IsSuccess = false, ErrorMessage = errorMessage });
+                }
             }
             catch (Exception e)
             {
-                return $"Unexpected error: {e.Message}";
+                var errorMessage = $"Unexpected error: {e.Message}";
+                foreach (var file in files)
+                {
+                    results.Add(new FileUploadResult { FileName = file.FileName, IsSuccess = false, ErrorMessage = errorMessage });
+                }
             }
+
+            return results;
         }
+    }
+
+    public class FileUploadResult
+    {
+        public string? FileName { get; set; }
+        public bool IsSuccess { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 }
